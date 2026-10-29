@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cuida-shell-v2';
+const CACHE_NAME = 'cuida-shell-v3';
 const APP_FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_FILES)).then(() => self.skipWaiting()));
@@ -10,6 +10,13 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const requestUrl = new URL(event.request.url);
   if (requestUrl.origin !== self.location.origin) return;
+  if (event.request.mode === 'navigate') {
+    event.respondWith(fetch(event.request, { cache: 'no-store' }).then(response => {
+      if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put('./index.html', response.clone()));
+      return response;
+    }).catch(() => caches.match('./index.html')));
+    return;
+  }
   event.respondWith(caches.match(event.request).then(cached => {
     if (cached) return cached;
     return fetch(event.request).then(response => {
@@ -18,5 +25,6 @@ self.addEventListener('fetch', event => {
     }).catch(() => caches.match('./index.html'));
   }));
 });
+
 
 
