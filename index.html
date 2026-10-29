@@ -25,9 +25,10 @@ function openInstallHelp(title,text,steps){document.getElementById('installTitle
 function closeInstallHelp(){document.getElementById('installWrap').classList.remove('open')}
 async function installApp(){if(pendingInstallPrompt){pendingInstallPrompt.prompt();const result=await pendingInstallPrompt.userChoice;pendingInstallPrompt=null;if(result.outcome==='accepted'){showToast('Cuida se está instalando');}return;}const standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;if(standalone){showToast('Cuida ya está en tu pantalla de inicio');return;}const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);if(ios){openInstallHelp('Añade Cuida a tu inicio','En Safari, puedes abrir Cuida como una app desde el icono de la pantalla de inicio.',['Toca el botón Compartir (el cuadrado con la flecha hacia arriba).','Desliza y elige “Añadir a pantalla de inicio”.','Confirma con “Añadir”.']);}else{openInstallHelp('Instala Cuida','Desde el menú de tu navegador, añade esta página a la pantalla de inicio.',['Abre el menú ⋮ del navegador.','Elige “Instalar aplicación” o “Añadir a pantalla de inicio”.','Confirma la instalación.']);}}
 if(window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true)document.getElementById('installBtn').hidden=true;
-if('serviceWorker' in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload());window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=3',{updateViaCache:'none'}).then(reg=>reg.update()).catch(()=>{}));}
 initDate();draw();
 </script></body></html>
+
 
 
 
